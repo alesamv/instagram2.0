@@ -39,3 +39,63 @@ export function createUser(req,res){
     }
 }
 
+export async function getUsers(req,res){
+    try {
+        const users = await User.find({})
+        if (!users) {
+            return res.status(400).json({
+                ok: false,
+                message: "No se encontraron usuarios"
+            })            
+        } else{
+            res.status(200).json({
+                ok: true,
+                users: users
+            })
+        }
+        console.log(users)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            error: "Hay un error en el servidor",
+            status: false
+        })
+    }
+}
+
+export async function updateUser(req,res){
+    try {
+        const { userId } = req.params
+        const{
+            name,
+            email,
+            user_name,
+            description
+        } = req.body
+        
+        const user = await User.findById(userId)
+        user.name = name
+        user.email = email
+        user.user_name = user_name
+        user.description = description
+
+        const userUpdated = await user.save();
+        if (!userUpdated) {
+            res.status(400).json({
+                ok: false,
+                message: 'El usuario no pudo ser guardado'
+            })            
+        }
+
+        return res.status(200).json({
+            ok:true,
+            userUpdated: userUpdated,
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            error: "Hay un error en el servidor",
+            status: false
+        })
+    }
+}
